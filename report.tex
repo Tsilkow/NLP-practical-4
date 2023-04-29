@@ -103,16 +103,56 @@ Basing my judgement on these calculations, I expect output \(c\) to be close to 
     \(c_2\) approximates vector \(u_a\). \\
     It's impossible to approximate \(u_b\) with \(c_2\) by adding either \(u_c\) or \(u_d\) to \(x_2\).
     Any of these vectors will increase in value equally along with \(u_b\). That means there's no way
-    for \(u_b\) to dominate the combination. \\
+    for \(u_b\) to dominate the combination.
   \item
+    \[
+    V &= u_b u^T_b \circ \frac{1}{||u_b||^2_2} - u_c u^T_c \circ \frac{1}{||u_c||^2_2} = (u_b u^T_b - u_c u^T_c) \circ \frac{1}{\beta^2} \\
+    K &= I \\
+    Q &= u_d u^T_a \circ \frac{1}{||u_a||^2_2} - u_c u^T_d \circ \frac{1}{||u_d||^2_2} = (u_d u^T_a - u_c u^T_d) \circ \frac{1}{\gamma^2} \\
+    \]
+    And to prove that these values work:
+    \[
+    v &= [u_b, 0, u_b - u_c] \\
+    q &= [u_c, u_d, 0] \\
+    \forall_{i \in \{1, 2, 3\}} k_i &= x_i \\
+    \intertext{This implies: }
+    \alpha_1 &\approx [0, 0, 1] \\
+    \alpha_2 &\approx [1, 0, 0] \\
+    c_1 &\approx v_3 = u_b - u_c \\
+    c_2 &\approx b_1 = u_b
+    \]
 \end{enumerate}
     
 \section{Pretraining Transformer-based Generative Model}
 \subsection*{d) Model with only finetuning}
 After 75 epochs of finetuning previously untrained model, in evaluation it achieved a score of 0.6\% (3 out of 500 correct). \\
 For comparison, naive model (outputting only ``London'' as an answer) achieved a score of 5.0\% (25 out of 500 correct). \\
+
 \subsection*{f) Fully trained model on CharCorruptedDataset}
 After 650 epochs of pretraining and 10 epochs of finetuning using Dataset with randomly masked substrings, the model achieved a score of 23.0\% (115 out of 500 correct) in evaluation. \\
+
+\subsection*{g) More computationally efficient transformer variants}
+\begin{enumerate}
+\item \textbf{Linformer} \\
+  Linformer architecture allows to reduce computational complexity of transformer to \(O(n)\), where \(n\) is the length of the sequence. It achieves that by approximating attention dot product matrix with a matrix of lower rank, calculated using SVD. Architecture is made even more efficient by substituting SVD with a simple linear projection to reduce the dimensionality.
+\item \textbf{BigBird} \\
+  BigBird model impreoves efficiency of transformers by limiting attention to number of pairs proportional to length of sequence (therefore of complexity \(O(n)\). Specific pairs that are used are: random, sliding window (neighbours of token) and limited global attention (attention with few, globally selected tokens).
+\item \textbf{Why is BigBird as efficient as full-attention mechanisms?} \\
+  Because mnost of BigBird's selected pairs of attention are universally significant: neighbours, tokens significant due to their position. Additionally included random pairs of attention, allow most of the context to be perceived and therefore the model can learn to weigh them as more or less improtant.
+\end{enumerate}
+
+\section{Pretrained Models as Source of Knowledge}
+\subsection*{a) Success of pretrained vs. failure of non-pretrained}
+At the beginning of fine-tuning, pretrained model has already learned universal relations in data. That extra knowledge allowed, after short fine-tuning, proved useful in comparison to noise that non-pretrained model knew of in the same position.
+\subsection*{b) User-facing systems implications}
+\begin{enumerate}
+\item False information (halucinating): such models will confidently assert falsities
+  \item Biased input leads to biased output: these models will be unable to critically assess biases and stereotypes present in the data
+\end{enumerate}
+\subsection*{c) Generating not yet learned data}
+When the model will be prompted with a question for a birth place of a person that it wasn't trained for, it will still attempt to answer. Most likely it will chose an answer for a person with similar name or from a general area, from where people with such names come from. This will showcase model's biases and apply it to given prompt.
+
+
 
 %  \smallbreak
 % --------------------------------------------------------------
