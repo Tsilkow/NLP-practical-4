@@ -172,6 +172,11 @@ class CharCorruptionDataset(Dataset):
 
     def __getitem__(self, idx):
         document = self.data[idx]
+        if len(document) < 4:
+            x = torch.tensor([0]*(self.block_size-1), dtype=torch.long)
+            y = torch.tensor([0]*(self.block_size-1), dtype=torch.long)
+            return x, y
+        
         truncated_len = random.randint(4, min(len(document), int(self.block_size*7/8)))
         truncated_doc = document[:truncated_len]
         mask_length = random.randint(int(truncated_len*0.125),
