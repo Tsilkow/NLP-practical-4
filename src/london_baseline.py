@@ -3,7 +3,7 @@
 # Hint: Make use of existing code.
 # Your solution here should only be a few lines.
 
-import utils
+from mingptdemo.mingpt import utils
 
 
 evaluation_corpus_path = 'birth_dev.tsv'
