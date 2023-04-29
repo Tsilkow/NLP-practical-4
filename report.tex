@@ -1,0 +1,116 @@
+% --------------------------------------------------------------
+% This is all preamble stuff that you don't have to worry about.
+% Head down to where it says "Start here"
+% --------------------------------------------------------------
+ 
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,mathtools}
+\newcommand{\shellcmd}[1]{\\\indent\indent\texttt{\footnotesize\# #1}\\}
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage[utf8]{inputenc}
+
+\def\[#1\]{\begin{align*}#1\end{align*}} 
+
+\begin{document}
+ 
+% --------------------------------------------------------------
+%                         Start here
+% --------------------------------------------------------------
+ 
+\title{Practical No. 4 }%replace X with the appropriate number
+\author{Tomasz Siłkowski\\ %replace with your name
+ts407106@students.mimuw.edu.pl}
+ 
+\maketitle
+
+\setcounter{section}{1}
+\section{Attention Exploration}
+\subsection*{a) Attention input for identity}
+For attention to approximately copy one of the value vectors \(v_i\), \(k^T_i q\)
+would have to significantly greater than \(k^T_j q\) for any \(j \neq i\).
+
+\medskip
+
+\subsection*{b) Query input for attention to return average }
+\[
+q = C (k_a + k_b), \text{where } C \gg 0
+\]
+
+\medskip
+
+\subsection*{c) Drawbacks of single-headed attention }
+\begin{enumerate}
+\item \[
+q = C (\mu_a + \mu_b), \text{where } C \gg 0
+\]
+Because covariance matrices for all keys \(k\) are identity matrix multiplied by a vanishingly small
+constant, we know that keys (random variables) \(k_a\) and \(k_b\) are not correlated, therefore
+independent. That means \(\mu_a\) and \(\mu_b\) are their best estimators and are also perpendicular
+to each other, they are the best guess for requested value. \\
+\item
+To restate the problem, we have \(k_a \sim \mathcal{N}(\mu_a, \alpha I + \frac{1}{2}(\mu_a\mu^T_a))\)
+where \(\alpha\) is vanishingly small. \\
+Let \(q = C (\mu_a + \mu_b)\) (same as part 1) and let \(k_b\) be the key pointing in the same
+direction as \(k_a\) but with different norm. This means:
+\[
+k^T_i q \approx
+\begin{cases*}
+  \varepsilon_a C & for \(i = a\), where \(\varepsilon_a \sim \mathcal{N}(1, \frac{1}{2})\) \\
+  \varepsilon_b C & for \(i = b\), where \(\varepsilon_b \sim \mathcal{N}(1, \frac{1}{2})\) \\
+  0 & otherwise
+\end{cases*}
+\]
+Because of that, when calculating \(c\):
+\[
+c &= \frac{\exp(\varepsilon_a C)}{\exp(\varepsilon_a C) + \exp(\varepsilon_b C)} v_a +
+\frac{\exp(\varepsilon_b C)}{\exp(\varepsilon_a C) + \exp(\varepsilon_b C)} v_b = \\
+&= \frac{1}{\exp((\varepsilon_a - \varepsilon_b) C)} v_a + \frac{1}{\exp((\varepsilon_b - \varepsilon_a) C)} v_b.
+\]
+Because \(\varepsilon_a\) and \(\varepsilon_b\) come from the same distribution, it is
+equally likely that \(c\) will be closer to \(v_a\) as to \(v_b\). This means \(c\) will be closer
+to
+whichever \(v_i\) has bigger \(|k_i|\) for \(i \in \{a, b\}\).
+\end{enumerate}
+
+\medskip
+
+\subsection*{d) Benefits of multi-headed attention }
+\begin{enumerate}
+\item
+\[
+q_1 &= C_1 \mu_a, \text{where } C_1 \gg 0 \\
+q_2 &= C_2 \mu_b, \text{where } C_2 \gg 0
+\]
+\item
+\[
+k^T_a q_1 &= C_1 \varepsilon_a \\
+k^T_b q_2 &= C_2 \varepsilon_b \\
+\intertext{Then: }
+c_1 &= v_a \\
+c_2 &= v_b \\
+c = \frac{1}{2}(c_1 + c_2) &\approx \frac{1}{2}(v_a + v_b)
+\]
+Basing my judgement on these calculations, I expect output \(c\) to be close to the average of
+\(v_a\) and \(v_b\).
+\end{enumerate}
+
+\subsection*{e) Key-Query-Value self-attention intuition }
+\begin{enumerate}
+  \item
+    \(c_2\) approximates vector \(u_a\). \\
+    It's impossible to approximate \(u_b\) with \(c_2\) by adding either \(u_c\) or \(u_d\) to \(x_2\).
+    Any of these vectors will increase in value equally along with \(u_b\). That means there's no way
+    for \(u_b\) to dominate the combination. \\
+  \item
+    
+
+
+%  \smallbreak
+% --------------------------------------------------------------
+%     You don't have to mess with anything below this line.
+% --------------------------------------------------------------
+ 
+\end{document}
