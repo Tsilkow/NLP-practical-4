@@ -105,11 +105,14 @@ Basing my judgement on these calculations, I expect output \(c\) to be close to 
     Any of these vectors will increase in value equally along with \(u_b\). That means there's no way
     for \(u_b\) to dominate the combination. \\
   \item
+\end{enumerate}
     
 \section{Pretraining Transformer-based Generative Model}
 \subsection*{d) Model with only finetuning}
-After 75 epochs of finetuning previously untrained model, in evaluation it achieved a score of 1.2\% (6 out of 500 correct). \\
+After 75 epochs of finetuning previously untrained model, in evaluation it achieved a score of 0.6\% (3 out of 500 correct). \\
 For comparison, naive model (outputting only ``London'' as an answer) achieved a score of 5.0\% (25 out of 500 correct). \\
+\subsection*{f) Fully trained model on CharCorruptedDataset}
+After 650 epochs of pretraining and 10 epochs of finetuning using Dataset with randomly masked substrings, the model achieved a score of 23.0\% (115 out of 500 correct) in evaluation. \\
 
 %  \smallbreak
 % --------------------------------------------------------------
